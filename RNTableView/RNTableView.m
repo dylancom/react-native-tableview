@@ -347,6 +347,9 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
         }
         
     }
+
+    // Every cell can have it's own text color.
+    cell.textLabel.textColor = [RCTConvert UIColor:item[@"textColor"]];
     
     if (self.selectedBackgroundColor && [item[@"selected"] intValue])
     {
@@ -497,7 +500,7 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
         cell.selectionStyle = [RCTConvert int:item[@"selectionStyle"]];
     }
 
-    // Add a custom options button.
+    // Add a custom accessory button.
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
     [button setTitle:@"\uF1D8" forState:UIControlStateNormal];
