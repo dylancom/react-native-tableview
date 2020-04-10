@@ -496,7 +496,27 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     if (item[@"selectionStyle"] != nil) {
         cell.selectionStyle = [RCTConvert int:item[@"selectionStyle"]];
     }
+
+    // Add a custom options button.
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
+    [button setTitle:@"\uF1D8" forState:UIControlStateNormal];
+    [button setTitleColor:self.tintColor forState:UIControlStateNormal];
+    [button.titleLabel setFont:[UIFont fontWithName: @"Material Design Icons" size: 22.0f]];
+    button.frame = CGRectMake(0, 0, 40, 64);
+    cell.accessoryView = button;
+
     return cell;
+}
+
+- (void)checkButtonTapped:(id)sender event:(id)event{
+    NSSet *touches = [event allTouches];
+    UITouch *touch = [touches anyObject];
+    CGPoint currentTouchPosition = [touch locationInView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint: currentTouchPosition];
+    if (indexPath != nil){
+        [self tableView: self.tableView accessoryButtonTappedForRowWithIndexPath: indexPath];
+    }
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
