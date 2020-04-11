@@ -380,6 +380,14 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
             UIGraphicsEndImageContext();
         } else {
             cell.imageView.image = image;
+
+            // Custom size.
+            CGSize itemSize = CGSizeMake(48, 48);
+            UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
+            CGRect imageRect = CGRectMake(0.0, 0.0, itemSize.width, itemSize.height);
+            [cell.imageView.image drawInRect:imageRect];
+            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
         }
     }
     
@@ -506,7 +514,7 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     [button setTitle:@"\uF1D8" forState:UIControlStateNormal];
     [button setTitleColor:self.tintColor forState:UIControlStateNormal];
     [button.titleLabel setFont:[UIFont fontWithName: @"Material Design Icons" size: 22.0f]];
-    button.frame = CGRectMake(0, 0, 40, 64);
+    button.frame = CGRectMake(0, 0, 48, 64);
     cell.accessoryView = button;
 
     return cell;

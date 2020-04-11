@@ -68,6 +68,8 @@ function stateFromProps(props) {
 
         if (el.image && typeof el.image === 'number') {
           el.image = resolveAssetSource(el.image);
+        } else if (el.image && typeof el.image === 'string') {
+          el.image = resolveAssetSource({ uri: el.image });
         }
 
         count++;
