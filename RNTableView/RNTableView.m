@@ -16,6 +16,7 @@
 #import "RNTableFooterView.h"
 #import "RNTableHeaderView.h"
 #import "RNReactModuleCell.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface RNTableView()<UITableViewDataSource, UITableViewDelegate> {
     id<RNTableViewDatasource> datasource;
@@ -381,6 +382,30 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
         } else {
             cell.imageView.image = image;
 
+            // Load artwork.
+            NSURL *fileURL = [NSURL fileURLWithPath:item[@"filePath"]];
+            AVAsset *asset = [AVURLAsset URLAssetWithURL:fileURL options:nil];
+            for (NSString *format in [asset availableMetadataFormats]) {
+                for (AVMetadataItem *item in [asset metadataForFormat:format]) {
+                    if ([[item commonKey] isEqualToString:@"artwork"]) {
+                        UIImage *artwork = nil;
+                        if ([item.keySpace isEqualToString:AVMetadataKeySpaceiTunes]) {
+                            artwork = [UIImage imageWithData:[item.value copyWithZone:nil]];
+                        }
+                        else { // if ([item.keySpace isEqualToString:AVMetadataKeySpaceID3]) {
+                            if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_7_1) {
+                                artwork = [UIImage imageWithData:item.dataValue];
+                            } else {
+                                NSDictionary *dict;
+                                [item.value copyWithZone:nil];
+                                artwork = [UIImage imageWithData:[dict objectForKey:@"data"]];
+                            }
+                        }
+                        cell.imageView.image = artwork;
+                    }
+                }
+            }
+            
             // Custom size.
             CGSize itemSize = CGSizeMake(48, 48);
             UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
