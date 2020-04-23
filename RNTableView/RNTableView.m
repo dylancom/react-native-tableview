@@ -210,7 +210,7 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     _tableView.dataSource = self;
     _tableView.delegate = self;
     _tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
-    _tableView.allowsMultipleSelectionDuringEditing = NO;
+    _tableView.allowsMultipleSelectionDuringEditing = YES;
     _tableView.contentInset = self.contentInset;
     _tableView.contentOffset = self.contentOffset;
     _tableView.scrollIndicatorInsets = self.scrollIndicatorInsets;
@@ -580,7 +580,9 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if (!_editing) {
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    }
     
     NSMutableDictionary *newValue = [self dataForRow:indexPath.item section:indexPath.section];
     newValue[@"target"] = self.reactTag;
