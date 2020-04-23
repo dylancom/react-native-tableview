@@ -532,12 +532,17 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     if (item[@"selectionStyle"] != nil) {
         cell.selectionStyle = [RCTConvert int:item[@"selectionStyle"]];
     }
+    
+    // Add a custom selected color.
+    UIView *selectedView = [[UIView alloc]init];
+    selectedView.backgroundColor = [RCTConvert UIColor:item[@"selectedColor"]];
+    cell.selectedBackgroundView =  selectedView;
 
     // Add a custom accessory button.
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
     [button setTitle:@"\uF1D8" forState:UIControlStateNormal];
-    [button setTitleColor:self.tintColor forState:UIControlStateNormal];
+    [button setTitleColor:[RCTConvert UIColor:item[@"accessoryColor"]] forState:UIControlStateNormal];
     [button.titleLabel setFont:[UIFont fontWithName: @"Material Design Icons" size: 22.0f]];
     button.frame = CGRectMake(0, 0, 48, 64);
     cell.accessoryView = button;
