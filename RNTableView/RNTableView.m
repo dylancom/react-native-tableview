@@ -532,11 +532,6 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     if (item[@"selectionStyle"] != nil) {
         cell.selectionStyle = [RCTConvert int:item[@"selectionStyle"]];
     }
-    
-    // Add a custom selected color.
-    UIView *selectedView = [[UIView alloc]init];
-    selectedView.backgroundColor = [RCTConvert UIColor:item[@"selectedColor"]];
-    cell.selectedBackgroundView =  selectedView;
 
     // Add a custom accessory button.
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
