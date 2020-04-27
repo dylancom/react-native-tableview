@@ -596,6 +596,17 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
                                     @"y": @(selectedCellRect.origin.y)
                                     };
     
+    if (_editing) {
+        NSArray *indexPathArray = [self.tableView indexPathsForSelectedRows];
+        NSMutableArray *selectedRows = [NSMutableArray new];
+        for(NSIndexPath *index in indexPathArray)
+        {
+            NSDictionary *row = @{@"section": [NSNumber numberWithInteger:index.section], @"row": [NSNumber numberWithInteger:index.row]};
+            [selectedRows addObject:row];
+        }
+        newValue[@"selectedRows"] = selectedRows;
+    }
+    
     /*
      * if allowToggle is enabled and we tap an already selected row, then remove the selection.
      * otherwise, add selection to the new row and remove selection from old row if multiple is not allowed.
@@ -618,6 +629,18 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     
     self.selectedIndexes[indexPath.section] = [NSNumber numberWithInteger:indexPath.item];
     _lastValue = newValue;
+}
+
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSArray *indexPathArray = [self.tableView indexPathsForSelectedRows];
+    NSMutableArray *selectedRows = [NSMutableArray new];
+    for(NSIndexPath *index in indexPathArray)
+    {
+        NSDictionary *row = @{@"section": [NSNumber numberWithInteger:index.section], @"row": [NSNumber numberWithInteger:index.row]};
+        [selectedRows addObject:row];
+    }
+    NSDictionary *dict = @{@"selectedRows": selectedRows};
+    self.onPress(dict);
 }
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {
