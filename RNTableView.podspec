@@ -12,6 +12,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => package["repository"]["url"] }
   s.source_files = 'RNTableView/*.{h,m}'
   s.preserve_paths = "**/*.js"
+  
   s.dependency 'React'
-
+  s.dependency 'TagLibIOS'
 end
