@@ -17,7 +17,7 @@
 #import "RNTableHeaderView.h"
 #import "RNReactModuleCell.h"
 #import <AVFoundation/AVFoundation.h>
-#import <react-native-mediatags/ArtworkImageData.h>
+#import "ArtworkImageData.h"
 
 @interface RNTableView()<UITableViewDataSource, UITableViewDelegate> {
     id<RNTableViewDatasource> datasource;
