@@ -214,6 +214,8 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     _tableView.allowsMultipleSelectionDuringEditing = YES;
     _tableView.contentInset = self.contentInset;
     _tableView.contentOffset = self.contentOffset;
+    _tableView.separatorInset = UIEdgeInsetsMake(0, 16, 0, 16);
+    _tableView.layoutMargins = UIEdgeInsetsMake(0, 16, 0, 16);
     _tableView.scrollIndicatorInsets = self.scrollIndicatorInsets;
     _tableView.showsHorizontalScrollIndicator = self.showsHorizontalScrollIndicator;
     _tableView.showsVerticalScrollIndicator = self.showsVerticalScrollIndicator;
