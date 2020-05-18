@@ -386,11 +386,11 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
             cell.imageView.image = image;
 
             // Load artwork.
-            NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
-            if (imageData) {
-                UIImage *artwork = [UIImage imageWithData:imageData];
-                cell.imageView.image = artwork;
-            }
+//             NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
+//             if (imageData) {
+//                 UIImage *artwork = [UIImage imageWithData:imageData];
+//                 cell.imageView.image = artwork;
+//             }
             
             // Custom size.
             CGSize itemSize = CGSizeMake(48, 48);
