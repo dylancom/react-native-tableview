@@ -35,6 +35,7 @@
     NSMutableArray *_cells;
     NSString *_reactModuleCellReuseIndentifier;
     NSMutableDictionary *_lastValue;
+    NSMutableDictionary *_artworks;
 }
 
 - (void)setEditing:(BOOL)editing {
@@ -368,38 +369,32 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     }
     
     if (item[@"image"]) {
-        UIImage *image;
-        if ([item[@"image"] isKindOfClass:[NSString class]])
-        {
-            image = [UIImage imageNamed:item[@"image"]];
-        } else {
-            image = [RCTConvert UIImage:item[@"image"]];
+        if (_artworks == nil) {
+            // TODO: Test if NSMutableArray is faster.
+            _artworks = [[NSMutableDictionary alloc] init];
         }
-        if ([item[@"imageWidth"] intValue]) {
-            CGSize itemSize = CGSizeMake([item[@"imageWidth"] intValue], image.size.height);
-            CGPoint itemPoint = CGPointMake((itemSize.width - image.size.width) / 2, (itemSize.height - image.size.height) / 2);
-            UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
-            [image drawAtPoint:itemPoint];
-            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
+        UIImage *artwork = _artworks[item[@"filename"]];
+        if (artwork) {
+            cell.imageView.image = artwork;
         } else {
+            NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
+            UIImage *image;
+            if (imageData) {
+                image = [UIImage imageWithData:imageData];
+            } else {
+                image = [RCTConvert UIImage:item[@"image"]];
+            }
             cell.imageView.image = image;
-
-            // Load artwork.
-//             NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
-//             if (imageData) {
-//                 UIImage *artwork = [UIImage imageWithData:imageData];
-//                 cell.imageView.image = artwork;
-//             }
-            
-            // Custom size.
-            CGSize itemSize = CGSizeMake(48, 48);
-            UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
-            CGRect imageRect = CGRectMake(0.0, 0.0, itemSize.width, itemSize.height);
-            [cell.imageView.image drawInRect:imageRect];
-            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
+            [_artworks setObject:cell.imageView.image forKey:item[@"filename"]];
         }
+        
+        // Custom size.
+        CGSize itemSize = CGSizeMake(48, 48);
+        UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
+        CGRect imageRect = CGRectMake(0.0, 0.0, itemSize.width, itemSize.height);
+        [cell.imageView.image drawInRect:imageRect];
+        cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
     }
     
     self.onWillDisplayCell(@{@"target":self.reactTag, @"row":@(indexPath.row), @"section": @(indexPath.section)});
