@@ -36,6 +36,7 @@
     NSString *_reactModuleCellReuseIndentifier;
     NSMutableDictionary *_lastValue;
     NSMutableDictionary *_artworks;
+    NSMutableArray *_artworksLoading;
 }
 
 - (void)setEditing:(BOOL)editing {
@@ -370,28 +371,37 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     
     if (item[@"image"]) {
         // https://khanlou.com/2012/08/asynchronous-downloaded-images-with-caching/
+        if (_artworks == nil) {
+            _artworks = [[NSMutableDictionary alloc] init];
+        }
+        if (_artworksLoading == nil) {
+            _artworksLoading = [[NSMutableArray alloc] init];
+        }
         NSData *cachedData = [_artworks objectForKey:item[@"filename"]];
         if (cachedData) {
             UIImage *image = [UIImage imageWithData:cachedData];
             cell.imageView.image = image;
         } else {
-            UIImage *placeholderImage = [RCTConvert UIImage:item[@"image"]];
-            cell.imageView.image = placeholderImage;
-            
-            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
-            dispatch_async(queue, ^{
-                NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
-                if (imageData) {
-                    [_artworks setObject:imageData forKey:item[@"filename"]];
-                    UIImage *image = [UIImage imageWithData:imageData];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [tableView cellForRowAtIndexPath:indexPath].imageView.image = image;
-                    });
-                } else {
-                    NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
-                    [_artworks setObject:placeholderImageData forKey:item[@"filename"]];
-                }
-            });
+            if (![_artworksLoading containsObject:item[@"filename"]]) {
+                [_artworksLoading addObject:item[@"filename"]];
+                UIImage *placeholderImage = [RCTConvert UIImage:item[@"image"]];
+                cell.imageView.image = placeholderImage;
+                
+                dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
+                dispatch_async(queue, ^{
+                    NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
+                    if (imageData) {
+                        [_artworks setObject:imageData forKey:item[@"filename"]];
+                        UIImage *image = [UIImage imageWithData:imageData];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [tableView cellForRowAtIndexPath:indexPath].imageView.image = image;
+                        });
+                    } else {
+                        NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
+                        [_artworks setObject:placeholderImageData forKey:item[@"filename"]];
+                    }
+                });
+            }
         }
         
         // Custom size.
