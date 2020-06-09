@@ -18,7 +18,6 @@
 #import "RNReactModuleCell.h"
 #import <AVFoundation/AVFoundation.h>
 #import "ArtworkImageData.h"
-#import <FTWCache/FTWCache.h>
 
 @interface RNTableView()<UITableViewDataSource, UITableViewDelegate> {
     id<RNTableViewDatasource> datasource;
@@ -371,7 +370,7 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     
     if (item[@"image"]) {
         // https://khanlou.com/2012/08/asynchronous-downloaded-images-with-caching/
-        NSData *cachedData = [FTWCache objectForKey:item[@"filename"]];
+        NSData *cachedData = [_artworks objectForKey:item[@"filename"]];
         if (cachedData) {
             UIImage *image = [UIImage imageWithData:cachedData];
             cell.imageView.image = image;
@@ -383,14 +382,14 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
             dispatch_async(queue, ^{
                 NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
                 if (imageData) {
-                    [FTWCache setObject:imageData forKey:item[@"filename"]];
+                    [_artworks setObject:imageData forKey:item[@"filename"]];
                     UIImage *image = [UIImage imageWithData:imageData];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [tableView cellForRowAtIndexPath:indexPath].imageView.image = image;
                     });
                 } else {
                     NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
-                    [FTWCache setObject:placeholderImageData forKey:item[@"filename"]];
+                    [_artworks setObject:placeholderImageData forKey:item[@"filename"]];
                 }
             });
         }
