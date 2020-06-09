@@ -18,6 +18,7 @@
 #import "RNReactModuleCell.h"
 #import <AVFoundation/AVFoundation.h>
 #import "ArtworkImageData.h"
+#import <FTWCache/FTWCache.h>
 
 @interface RNTableView()<UITableViewDataSource, UITableViewDelegate> {
     id<RNTableViewDatasource> datasource;
@@ -369,23 +370,29 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     }
     
     if (item[@"image"]) {
-        if (_artworks == nil) {
-            // TODO: Test if NSMutableArray is faster.
-            _artworks = [[NSMutableDictionary alloc] init];
-        }
-        UIImage *artwork = _artworks[item[@"filename"]];
-        if (artwork) {
-            cell.imageView.image = artwork;
-        } else {
-            NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
-            UIImage *image;
-            if (imageData) {
-                image = [UIImage imageWithData:imageData];
-            } else {
-                image = [RCTConvert UIImage:item[@"image"]];
-            }
+        // https://khanlou.com/2012/08/asynchronous-downloaded-images-with-caching/
+        NSData *cachedData = [FTWCache objectForKey:item[@"filename"]];
+        if (cachedData) {
+            UIImage *image = [UIImage imageWithData:cachedData];
             cell.imageView.image = image;
-            [_artworks setObject:cell.imageView.image forKey:item[@"filename"]];
+        } else {
+            UIImage *placeholderImage = [RCTConvert UIImage:item[@"image"]];
+            cell.imageView.image = placeholderImage;
+            
+            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
+            dispatch_async(queue, ^{
+                NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
+                if (imageData) {
+                    [FTWCache setObject:imageData forKey:item[@"filename"]];
+                    UIImage *image = [UIImage imageWithData:imageData];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [tableView cellForRowAtIndexPath:indexPath].imageView.image = image;
+                    });
+                } else {
+                    NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
+                    [FTWCache setObject:placeholderImageData forKey:item[@"filename"]];
+                }
+            });
         }
         
         // Custom size.
