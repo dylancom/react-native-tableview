@@ -19,19 +19,15 @@
     CGRect cvf = self.contentView.frame;
     CGRect frame = CGRectMake(cvf.size.height + MARGIN,
                               self.textLabel.frame.origin.y,
-                              cvf.size.width - cvf.size.height - 2*MARGIN,
+                              cvf.size.width - cvf.size.height - 1*MARGIN,
                               self.textLabel.frame.size.height);
     self.textLabel.frame = frame;
 
     frame = CGRectMake(cvf.size.height + MARGIN,
                        self.detailTextLabel.frame.origin.y,
-                       cvf.size.width - cvf.size.height - 2*MARGIN,
+                       cvf.size.width - cvf.size.height - 1*MARGIN,
                        self.detailTextLabel.frame.size.height);
     self.detailTextLabel.frame = frame;
-    
-    CGRect adjustedFrame = self.accessoryView.frame;
-    adjustedFrame.origin.x = self.frame.size.width - 48 - 20;
-    self.accessoryView.frame = adjustedFrame;
 }
 
 @end
