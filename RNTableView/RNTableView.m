@@ -16,6 +16,8 @@
 #import "RNTableFooterView.h"
 #import "RNTableHeaderView.h"
 #import "RNReactModuleCell.h"
+#import "CustomCell.h"
+#import "CustomCellSectionIndex.h"
 #import <AVFoundation/AVFoundation.h>
 #import "ArtworkImageData.h"
 
@@ -493,7 +495,11 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     } else {
         cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
         if (cell == nil) {
-            cell = [[UITableViewCell alloc] initWithStyle:self.tableViewCellStyle reuseIdentifier:@"Cell"];
+            if (_sectionIndexTitlesEnabled) {
+                cell = [[CustomCellSectionIndex alloc] initWithStyle:self.tableViewCellStyle reuseIdentifier:@"Cell"];
+            } else {
+                cell = [[CustomCell alloc] initWithStyle:self.tableViewCellStyle reuseIdentifier:@"Cell"];
+            }
         }
         cell.textLabel.text = item[@"label"];
         cell.detailTextLabel.text = item[@"detail"];
