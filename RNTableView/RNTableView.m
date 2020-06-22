@@ -370,6 +370,9 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     }
     
     if (item[@"image"]) {
+        cell.imageView.layer.masksToBounds = YES;
+        cell.imageView.layer.cornerRadius = 3.0;
+        
         // https://khanlou.com/2012/08/asynchronous-downloaded-images-with-caching/
         if (_artworks == nil) {
             _artworks = [[NSMutableDictionary alloc] init];
