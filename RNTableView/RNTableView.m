@@ -536,7 +536,7 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     // Add a custom accessory button.
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button addTarget:self action:@selector(checkButtonTapped:event:) forControlEvents:UIControlEventTouchUpInside];
-    [button setTitle:@"󰇘" forState:UIControlStateNormal];
+    [button setTitle:@"\U000f01d8" forState:UIControlStateNormal];
     [button setTitleColor:[RCTConvert UIColor:item[@"accessoryColor"]] forState:UIControlStateNormal];
     [button.titleLabel setFont:[UIFont fontWithName: @"Material Design Icons" size: 22.0f]];
     button.frame = CGRectMake(0, 0, 48, 64);
