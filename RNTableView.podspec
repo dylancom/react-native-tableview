@@ -13,6 +13,6 @@ Pod::Spec.new do |s|
   s.source_files = 'RNTableView/*.{h,m}'
   s.preserve_paths = "**/*.js"
   
-  s.dependency 'React'
+  s.dependency 'React-Core'
   s.dependency 'TagLibSwift'
 end
