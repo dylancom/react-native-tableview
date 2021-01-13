@@ -387,6 +387,10 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
         } else {
             cell.imageView.image = image;
         }
+        if ([item[@"imageBorderRadius"] intValue]) {
+            cell.imageView.layer.masksToBounds = YES;
+            cell.imageView.layer.cornerRadius = [item[@"imageBorderRadius"] intValue];
+        }
     }
     
     self.onWillDisplayCell(@{@"target":self.reactTag, @"row":@(indexPath.row), @"section": @(indexPath.section)});
