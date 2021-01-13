@@ -151,11 +151,6 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     [_tableView setShowsVerticalScrollIndicator: showsVerticalScrollIndicator];
 }
 
-- (void)setTintColor:(UIColor *)tintColor {
-    _tintColor = tintColor;
-    _tableView.sectionIndexColor = tintColor;
-}
-
 #pragma mark -
 
 - (void)layoutSubviews {
@@ -229,7 +224,6 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     _tableView.separatorColor = self.separatorColor;
     _tableView.scrollEnabled = self.scrollEnabled;
     _tableView.editing = self.editing;
-    _tableView.sectionIndexColor = self.tintColor;
     _reactModuleCellReuseIndentifier = @"ReactModuleCell";
     [_tableView registerClass:[RNReactModuleCell class] forCellReuseIdentifier:_reactModuleCellReuseIndentifier];
     [self addSubview:_tableView];
