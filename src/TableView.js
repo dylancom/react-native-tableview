@@ -68,8 +68,6 @@ function stateFromProps(props) {
 
         if (el.image && typeof el.image === 'number') {
           el.image = resolveAssetSource(el.image);
-        } else if (el.image && typeof el.image === 'string') {
-          el.image = resolveAssetSource({ uri: el.image });
         }
 
         count++;
@@ -373,7 +371,7 @@ class TableView extends React.Component {
     return (
       <View style={[{ flex: 1 }, this.props.style]}>
         <RNTableView
-          ref={ref => {
+          ref={(ref) => {
             this.tableView = ref;
           }}
           sections={this.state.sections}

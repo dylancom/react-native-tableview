@@ -18,8 +18,6 @@
 #import "RNReactModuleCell.h"
 #import "CustomCell.h"
 #import "CustomCellSectionIndex.h"
-#import <AVFoundation/AVFoundation.h>
-#import "ArtworkImageData.h"
 
 @interface RNTableView()<UITableViewDataSource, UITableViewDelegate> {
     id<RNTableViewDatasource> datasource;
@@ -37,8 +35,6 @@
     NSMutableArray *_cells;
     NSString *_reactModuleCellReuseIndentifier;
     NSMutableDictionary *_lastValue;
-    NSMutableDictionary *_artworks;
-    NSMutableArray *_artworksLoading;
 }
 
 - (void)setEditing:(BOOL)editing {
@@ -357,9 +353,9 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
         }
         
     }
-
-    // Every cell can have it's own text color.
-    cell.textLabel.textColor = [RCTConvert UIColor:item[@"textColor"]];
+    if (item[@"textColor"]) {
+        cell.textLabel.textColor = [RCTConvert UIColor:item[@"textColor"]];
+    }
     
     if (self.selectedBackgroundColor && [item[@"selected"] intValue])
     {
@@ -374,41 +370,22 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     }
     
     if (item[@"image"]) {
-        cell.imageView.layer.masksToBounds = YES;
-        cell.imageView.layer.cornerRadius = 3.0;
-        
-        // https://khanlou.com/2012/08/asynchronous-downloaded-images-with-caching/
-        if (_artworks == nil) {
-            _artworks = [[NSMutableDictionary alloc] init];
-        }
-        if (_artworksLoading == nil) {
-            _artworksLoading = [[NSMutableArray alloc] init];
-        }
-        NSData *cachedData = [_artworks objectForKey:item[@"filename"]];
-        if (cachedData) {
-            UIImage *image = [UIImage imageWithData:cachedData];
-            cell.imageView.image = image;
+        UIImage *image;
+        if ([item[@"image"] isKindOfClass:[NSString class]])
+        {
+            image = [UIImage imageNamed:item[@"image"]];
         } else {
-            if (![_artworksLoading containsObject:item[@"filename"]]) {
-                [_artworksLoading addObject:item[@"filename"]];
-                UIImage *placeholderImage = [RCTConvert UIImage:item[@"image"]];
-                cell.imageView.image = placeholderImage;
-                
-                dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
-                dispatch_async(queue, ^{
-                    NSData *imageData = [ArtworkImageData getData:item[@"filePath"]];
-                    if (imageData) {
-                        [_artworks setObject:imageData forKey:item[@"filename"]];
-                        UIImage *image = [UIImage imageWithData:imageData];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [tableView cellForRowAtIndexPath:indexPath].imageView.image = image;
-                        });
-                    } else {
-                        NSData *placeholderImageData = UIImagePNGRepresentation(placeholderImage);
-                        [_artworks setObject:placeholderImageData forKey:item[@"filename"]];
-                    }
-                });
-            }
+            image = [RCTConvert UIImage:item[@"image"]];
+        }
+        if ([item[@"imageWidth"] intValue]) {
+            CGSize itemSize = CGSizeMake([item[@"imageWidth"] intValue], image.size.height);
+            CGPoint itemPoint = CGPointMake((itemSize.width - image.size.width) / 2, (itemSize.height - image.size.height) / 2);
+            UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
+            [image drawAtPoint:itemPoint];
+            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+        } else {
+            cell.imageView.image = image;
         }
     }
     
@@ -556,7 +533,7 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return nil;
+    return _sections[section][@"label"];
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
