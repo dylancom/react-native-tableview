@@ -30,6 +30,7 @@
 @property(nonatomic, strong) NSString *json;
 @property(nonatomic, strong) NSString *filter;
 @property(nonatomic, strong) NSArray *filterArgs;
+@property(nonatomic, strong) NSDictionary *iTunesParams;
 @property(nonatomic, strong) id selectedValue;
 @property(nonatomic) float cellHeight;
 @property(nonatomic) float footerHeight;

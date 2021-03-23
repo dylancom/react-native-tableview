@@ -18,6 +18,7 @@
 #import "RNReactModuleCell.h"
 #import "CustomCell.h"
 #import "CustomCellSectionIndex.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 @interface RNTableView()<UITableViewDataSource, UITableViewDelegate> {
     id<RNTableViewDatasource> datasource;
@@ -35,6 +36,7 @@
     NSMutableArray *_cells;
     NSString *_reactModuleCellReuseIndentifier;
     NSMutableDictionary *_lastValue;
+    MPMediaQuery *_songsQuery;
 }
 
 - (void)setEditing:(BOOL)editing {
@@ -162,6 +164,25 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
 - (void)setTintColor:(UIColor *)tintColor {
     _tintColor = tintColor;
     _tableView.sectionIndexColor = tintColor;
+}
+
+- (void)setITunesParams:(NSDictionary *)params {
+    _songsQuery = [MPMediaQuery songsQuery];
+    NSDictionary *query = [RCTConvert NSDictionary:params[@"query"]];
+    if ([query objectForKey:@"albumTitle"] != nil) {
+        NSString *searchAlbumTitle = [query objectForKey:@"albumTitle"];
+        [_songsQuery addFilterPredicate:[MPMediaPropertyPredicate predicateWithValue:searchAlbumTitle forProperty:MPMediaItemPropertyAlbumTitle comparisonType:MPMediaPredicateComparisonContains]];
+    }
+    if ([query objectForKey:@"artist"] != nil) {
+        NSString *searchArtist = [query objectForKey:@"artist"];
+        [_songsQuery addFilterPredicate:[MPMediaPropertyPredicate predicateWithValue:searchArtist forProperty:MPMediaItemPropertyArtist comparisonType:MPMediaPredicateComparisonContains]];
+    }
+    if ([query objectForKey:@"playlistName"] != nil) {
+        NSString *playlistName = [query objectForKey:@"playlistName"];
+        [_songsQuery addFilterPredicate:[MPMediaPropertyPredicate predicateWithValue:playlistName forProperty:MPMediaPlaylistPropertyName comparisonType:MPMediaPredicateComparisonContains]];
+    }
+    [_songsQuery addFilterPredicate:[MPMediaPropertyPredicate predicateWithValue:[NSNumber numberWithBool:NO] forProperty:MPMediaItemPropertyIsCloudItem]];
+    [_songsQuery addFilterPredicate:[MPMediaPropertyPredicate predicateWithValue:[NSNumber numberWithBool:NO] forProperty:MPMediaItemPropertyHasProtectedAsset]];
 }
 
 #pragma mark -
@@ -384,21 +405,34 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     
     if (item[@"image"]) {
         UIImage *image;
-        if ([item[@"image"] isKindOfClass:[NSString class]])
-        {
-            image = [UIImage imageNamed:item[@"image"]];
-        } else {
-            image = [RCTConvert UIImage:item[@"image"]];
+        
+        if (_songsQuery.items.count > indexPath.row) {
+            MPMediaItem* mediaItem = [_songsQuery.items objectAtIndex:indexPath.row];
+            MPMediaItemArtwork *artwork = [mediaItem valueForProperty: MPMediaItemPropertyArtwork];
+            if (artwork != nil) {
+                CGFloat artworkSize = [RCTConvert int:item[@"artworkSize"]];
+                image = [artwork imageWithSize:CGSizeMake(artworkSize, artworkSize)];
+                cell.imageView.image = image;
+            }
         }
-        if ([item[@"imageWidth"] intValue]) {
-            CGSize itemSize = CGSizeMake([item[@"imageWidth"] intValue], image.size.height);
-            CGPoint itemPoint = CGPointMake((itemSize.width - image.size.width) / 2, (itemSize.height - image.size.height) / 2);
-            UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
-            [image drawAtPoint:itemPoint];
-            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-        } else {
-            cell.imageView.image = image;
+        
+        if (image == nil) {
+            if ([item[@"image"] isKindOfClass:[NSString class]])
+            {
+                image = [UIImage imageNamed:item[@"image"]];
+            } else {
+                image = [RCTConvert UIImage:item[@"image"]];
+            }
+            if ([item[@"imageWidth"] intValue]) {
+                CGSize itemSize = CGSizeMake([item[@"imageWidth"] intValue], image.size.height);
+                CGPoint itemPoint = CGPointMake((itemSize.width - image.size.width) / 2, (itemSize.height - image.size.height) / 2);
+                UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
+                [image drawAtPoint:itemPoint];
+                cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+            } else {
+                cell.imageView.image = image;
+            }
         }
         if ([item[@"imageBorderRadius"] intValue]) {
             cell.imageView.layer.masksToBounds = YES;
