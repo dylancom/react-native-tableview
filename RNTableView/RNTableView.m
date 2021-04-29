@@ -406,7 +406,7 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     if (item[@"image"]) {
         UIImage *image;
         
-        if (_songsQuery.items.count > indexPath.row) {
+        if (_songsQuery && _songsQuery.items.count > indexPath.row) {
             MPMediaItem* mediaItem = [_songsQuery.items objectAtIndex:indexPath.row];
             MPMediaItemArtwork *artwork = [mediaItem valueForProperty: MPMediaItemPropertyArtwork];
             if (artwork != nil) {
