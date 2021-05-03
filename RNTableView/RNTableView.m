@@ -407,7 +407,8 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
         UIImage *image;
         
         if (_songsQuery && _songsQuery.items.count > indexPath.row) {
-            MPMediaItem* mediaItem = [_songsQuery.items objectAtIndex:indexPath.row];
+            NSUInteger currLoc = _songsQuery.itemSections[indexPath.section].range.location;
+            MPMediaItem* mediaItem = [_songsQuery.items objectAtIndex:indexPath.row + currLoc];
             MPMediaItemArtwork *artwork = [mediaItem valueForProperty: MPMediaItemPropertyArtwork];
             if (artwork != nil) {
                 CGFloat artworkSize = [RCTConvert int:item[@"artworkSize"]];
